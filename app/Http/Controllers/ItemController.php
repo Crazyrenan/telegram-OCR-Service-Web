@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http; 
 
 class ItemController extends Controller
@@ -94,6 +95,26 @@ class ItemController extends Controller
         ]);
 
         return redirect()->route('items.index')->with('success', 'Item list sent to Telegram!');
+    }
+
+     public function testApplicationDbConnection()
+    {
+        try {
+            // Specify the connection name we created in config/database.php
+            // Then, run a simple query on the 'users' table.
+            $firstUser = DB::connection('mysql_application')->table('users')->first();
+
+            // If the connection and query succeed, dump the result and stop.
+            if ($firstUser) {
+                dd("✅ Connection to 'application' database SUCCESSFUL!", $firstUser);
+            } else {
+                dd("✅ Connection to 'application' database successful, but the 'users' table is empty.");
+            }
+
+        } catch (\Exception $e) {
+            // If the connection fails, catch the error and display a helpful message.
+            dd("❌ FAILED to connect to the 'application' database. Please check your .env settings.", $e->getMessage());
+        }
     }
 }
 
