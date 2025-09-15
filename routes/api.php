@@ -8,6 +8,7 @@ use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\LogisticsController;
+use App\Http\Controllers\ProfileController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -30,3 +31,8 @@ Route::get('/project-details/{project_id}', [ProjectController::class, 'projectD
 
 Route::get('/upcoming-deliveries', [LogisticsController::class, 'getUpcomingDeliveries']);
 Route::get('/delivery-details/{po_number}', [LogisticsController::class, 'getDeliveryDetails']);
+
+
+Route::post('/telegram-connect/verify', [ProfileController::class, 'verifyTelegramConnectionApi']);
+
+require __DIR__.'/auth.php';

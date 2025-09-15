@@ -26,8 +26,7 @@ class DashboardController extends Controller
 
         $totalSpendingThisMonth = DB::connection('mysql_application')
             ->table('pembelian')
-            ->whereYear('purchase_date', Carbon::now()->year)
-            ->whereMonth('purchase_date', Carbon::now()->month)
+            ->whereMonth('purchase_date', Carbon::now()->month) // Only check the month number
             ->sum('grand_total');
             
         return view('dashboard', [
@@ -37,3 +36,4 @@ class DashboardController extends Controller
         ]);
     }
 }
+

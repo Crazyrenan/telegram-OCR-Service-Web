@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchaseRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class PurchaseRequestController extends Controller
 {
-
     public function index()
     {
         $requests = PurchaseRequest::where('user_id', Auth::id())->latest()->get();
@@ -56,29 +56,36 @@ class PurchaseRequestController extends Controller
 
     public function resendNotification(PurchaseRequest $purchaseRequest)
     {
-        // For security, ensure the request is actually still pending before resending
         if ($purchaseRequest->status === 'pending') {
             $this->notifyManagerViaBot($purchaseRequest);
             return back()->with('success', 'Approval notification has been resent!');
         }
-
-        return back()->with('error', 'This request is no longer pending and cannot be re-sent.');
+        return back()->with('error', 'This request is no longer pending.');
     }
+
 
     private function notifyManagerViaBot(PurchaseRequest $purchaseRequest)
     {
+        $manager = User::where('role', 'manager')->first();
+
+        if (!$manager || !$manager->telegram_chat_id) {
+            Log::error('Manager with role "manager" not found or has not connected their Telegram account.');
+            return;
+        }
+
         try {
             $flaskUrl = 'http://127.0.0.1:5001/send-approval-request';
             
             Http::post($flaskUrl, [
+                'manager_chat_id' => $manager->telegram_chat_id,
                 'request_id' => $purchaseRequest->id,
-                'user_name' => $purchaseRequest->user->name, // Get the name from the relationship
+                'user_name' => Auth::user()->name, 
                 'item_name' => $purchaseRequest->item_name,
                 'amount' => $purchaseRequest->amount,
                 'reason' => $purchaseRequest->reason,
             ]);
 
-            Log::info('Successfully sent approval request to Flask service for request ID: ' . $purchaseRequest->id);
+            Log::info('Successfully sent approval request to Flask service.');
         } catch (\Exception $e) {
             Log::error('Failed to send approval request to Flask service: ' . $e->getMessage());
         }

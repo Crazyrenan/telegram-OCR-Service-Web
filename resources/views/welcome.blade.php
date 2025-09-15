@@ -11,17 +11,17 @@
             </svg>
         </div>
 
-        <!-- Main Heading -->
+        
         <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mt-6">
             Welcome to the TelePortal
         </h1>
 
-        <!-- Subheading -->
+       
         <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
             Pusat terpadu untuk mengelola data aplikasi sekaligus memperoleh wawasan real-time melalui Bot Telegram yang terintegrasi.
         </p>
 
-        <!-- Call to Action Buttons -->
+
         <div class="mt-8 flex justify-center items-center space-x-4">
             <!-- This link now correctly points to the login page -->
             <a href="{{ route('login') }}" class="bg-white text-gray-700 font-bold py-3 px-6 rounded-lg border-2 border-gray-300 hover:bg-gray-100 transition duration-300">
@@ -35,7 +35,6 @@
 
     </div>
 
-    <!-- Feature Section -->
     <div class="mt-16 grid md:grid-cols-3 gap-8 text-left">
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-xl font-bold text-gray-800">Real-Time Alerts</h3>
