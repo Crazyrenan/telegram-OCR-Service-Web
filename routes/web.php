@@ -5,8 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseRequestController;
-use App\Http\Controllers\PurchaseManagementController;
+use App\Http\Controllers\VendorManagementController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\PurchaseReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,15 +48,21 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::post('/items/send-telegram', [ItemController::class, 'sendToTelegram'])->name('items.sendToTelegram');
 
+    Route::get('/manage/vendors', [VendorManagementController::class, 'index'])->name('vendors.manage.index');
+    Route::get('/manage/vendors/create', [VendorManagementController::class, 'create'])->name('vendors.manage.create');
+    Route::post('/manage/vendors', [VendorManagementController::class, 'store'])->name('vendors.manage.store');
+    Route::get('/manage/vendors/{id}/edit', [VendorManagementController::class, 'edit'])->name('vendors.manage.edit');
+    Route::put('/manage/vendors/{id}', [VendorManagementController::class, 'update'])->name('vendors.manage.update');
+
     // --- Manager-Only Routes ---
     Route::middleware(['can:manage-users'])->group(function () {
         // User Role Management
         Route::get('/manage/users', [UserManagementController::class, 'index'])->name('users.manage.index');
         Route::post('/manage/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.manage.updateRole');
-        
-        // Purchase Status Management
-        Route::get('/manage/purchases', [PurchaseManagementController::class, 'index'])->name('purchases.manage.index');
-        Route::post('/manage/purchases/{id}/status', [PurchaseManagementController::class, 'updateStatus'])->name('purchases.manage.updateStatus');
+
+        Route::get('/reports/purchases', [PurchaseReportController::class, 'index'])->name('reports.purchases.index');
+        Route::get('/reports/purchases/export', [PurchaseReportController::class, 'export'])->name('reports.purchases.export');
+        Route::get('/web-api/reports/purchases', [PurchaseReportController::class, 'fetchData'])->name('reports.purchases.data');
     });
 
 });

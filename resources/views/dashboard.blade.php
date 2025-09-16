@@ -32,24 +32,21 @@
         </div>
     </div>
 
-    <!-- Quick Action Cards -->
+    <!-- User Action Cards -->
     <div class="grid md:grid-cols-2 gap-8">
-        <!-- Manage Purchases Card -->
-        <a href="{{ route('purchases.manage.index') }}" class="block bg-white rounded-lg shadow-lg p-8 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
+        <a href="{{ route('vendors.manage.index') }}" class="block bg-white rounded-lg shadow-lg p-8 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center space-x-4">
                 <div class="bg-indigo-100 p-3 rounded-full">
                     <svg class="w-8 h-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.375a.75.75 0 01.75.75v3.375a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75V7.5a.75.75 0 01.75-.75zM9 15h2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75V15.75A.75.75 0 019 15z" />
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800">Manage All Purchases</h3>
-                    <p class="mt-1 text-gray-600">View and update the status of all company purchases.</p>
+                    <h3 class="text-xl font-bold text-gray-800">Manage All Vendors</h3>
+                    <p class="mt-1 text-gray-600">View and update the status of all Vendors.</p>
                 </div>
             </div>
         </a>
-
-        <!-- My Purchase Requests Card -->
         <a href="{{ route('requests.index') }}" class="block bg-white rounded-lg shadow-lg p-8 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center space-x-4">
                 <div class="bg-green-100 p-3 rounded-full">
@@ -64,6 +61,41 @@
             </div>
         </a>
     </div>
+
+    @can('manage-users')
+    <div class="mt-12 border-t-2 pt-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Manager Tools</h3>
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Purchase Report Card -->
+            <a href="{{ route('reports.purchases.index') }}" class="block bg-white rounded-lg shadow-lg p-8 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 100 15 7.5 7.5 0 000-15zM21 21l-5.197-5.197" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Purchase Report</h3>
+                        <p class="mt-1 text-gray-600">Filter, view, and export detailed purchase reports.</p>
+                    </div>
+                </div>
+            </a>
+            <a href="{{ route('users.manage.index') }}" class="block bg-white rounded-lg shadow-lg p-8 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.663c.11-.205.228-.409.354-.614a3.375 3.375 0 015.63 2.493z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">User Management</h3>
+                        <p class="mt-1 text-gray-600">View all users and assign manager roles.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    @endcan
 </div>
 @endsection
 
