@@ -27,10 +27,6 @@ class LogisticsController extends Controller
 
         return response()->json($deliveries);
     }
-
-    /**
-     * NEW: Provides detailed information for a single purchase order.
-     */
     public function getDeliveryDetails($po_number)
     {
         $details = DB::connection('mysql_application')

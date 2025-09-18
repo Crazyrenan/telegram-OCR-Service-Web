@@ -62,8 +62,6 @@ class PurchaseRequestController extends Controller
 
         $purchaseRequest->status = $validated['status'];
         $purchaseRequest->save();
-
-        // After updating, send a notification back to the original user.
         $this->notifyUserOfStatusUpdate($purchaseRequest);
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
@@ -84,9 +82,7 @@ class PurchaseRequestController extends Controller
 
     private function notifyManagerViaBot(PurchaseRequest $purchaseRequest)
     {
-        // Find the user with the 'manager' role from the default ('telegram') database
         $manager = User::where('role', 'manager')->first();
-
         if (!$manager || !$manager->telegram_chat_id) {
             Log::error('Manager with role "manager" not found or has not connected their Telegram account.');
             return;
@@ -123,7 +119,6 @@ class PurchaseRequestController extends Controller
         }
 
         try {
-            // Call a new, dedicated endpoint on our Python service
             $flaskUrl = 'http://127.0.0.1:5001/notify-user';
             
             Http::post($flaskUrl, [

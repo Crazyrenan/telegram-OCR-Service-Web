@@ -57,7 +57,6 @@ class DataController extends Controller
                     DB::rollBack();
                     return response()->json(['success' => false, 'errors' => $errors], 400);
                 }
-                // --- End Validation ---
 
                 $purchaseData = [
                     'vendor_id' => $vendorId, 'project_id' => $projectId, 'requested_by' => $requestedBy,
@@ -93,8 +92,6 @@ class DataController extends Controller
             return response()->json(['success' => false, 'errors' => ["An error occurred on row {$rowNumber}: " . $e->getMessage()]], 500);
         }
     }
-
-    // This method now fetches data and can be used by both CSV and PDF exports
     public function exportPurchasesApi(Request $request)
     {
         $data = $this->fetchPurchaseReportData($request);
@@ -149,7 +146,6 @@ class DataController extends Controller
         return response(implode(',', $headers), 200, ['Content-Type' => 'text/csv']);
     }
     
-    // Your refactored private method to fetch data
     private function fetchPurchaseReportData(Request $request)
     {
         $query = DB::connection('mysql_application')->table('pembelian as p')

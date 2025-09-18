@@ -27,10 +27,8 @@ class ReportController extends Controller
         $topCategory = $topCategoryData ? $topCategoryData->category : 'N/A';
         $categoryCount = $summaryQuery->clone()->distinct()->count('category');
 
-        // Pass only the summary stats to the dedicated formatter
         $message = $this->formatScheduledReportForTelegram($totalQuantity, $topCategory, $categoryCount);
         
-        // Send the pre-formatted message to the Flask service
         $this->sendToFlaskService(['message' => $message]);
         
         return "Automated summary report has been sent to Telegram!";
@@ -46,7 +44,6 @@ class ReportController extends Controller
 
     private function getReportData($year, $month = null)
     {
-        // Use when() for cleaner conditional filtering
         $baseQuery = DB::connection('mysql_application')
             ->table('pembelian')
             ->whereYear('purchase_date', '=', $year)

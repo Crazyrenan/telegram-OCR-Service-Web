@@ -11,7 +11,7 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::latest()->get(); // Get all items, newest first
+        $items = Item::latest()->get(); 
         return view('items.index', compact('items'));
     }
 
@@ -30,10 +30,7 @@ class ItemController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        // Create the new item
         Item::create($request->all());
-
-        // Redirect back to the main list with a success message
         return redirect()->route('items.index')->with('success', 'Item created successfully.');
     }
 
@@ -49,11 +46,7 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-
-        // Update the item
         $item->update($request->all());
-
-        // Redirect back to the main list with a success message
         return redirect()->route('items.index')->with('success', 'Item updated successfully.');
     }
 
@@ -77,8 +70,6 @@ class ItemController extends Controller
         if ($items->isEmpty()) {
             return back()->with('success', 'There is no data to send.');
         }
-
-        // Format the data into an HTML string for Telegram
         $message = "<b>Item Report from Website:</b>\n\n";
         $message .= "<pre>| ID | Name              | Description         |\n";
         $message .= "|----|-------------------|---------------------|\n";
@@ -100,11 +91,7 @@ class ItemController extends Controller
      public function testApplicationDbConnection()
     {
         try {
-            // Specify the connection name we created in config/database.php
-            // Then, run a simple query on the 'users' table.
             $firstUser = DB::connection('mysql_application')->table('users')->first();
-
-            // If the connection and query succeed, dump the result and stop.
             if ($firstUser) {
                 dd("✅ Connection to 'application' database SUCCESSFUL!", $firstUser);
             } else {
@@ -112,7 +99,6 @@ class ItemController extends Controller
             }
 
         } catch (\Exception $e) {
-            // If the connection fails, catch the error and display a helpful message.
             dd("❌ FAILED to connect to the 'application' database. Please check your .env settings.", $e->getMessage());
         }
     }

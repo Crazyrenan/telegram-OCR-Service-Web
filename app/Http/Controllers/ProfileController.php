@@ -68,8 +68,7 @@ class ProfileController extends Controller
         try {
             $token = Str::random(16);
             $now = Carbon::now();
-
-            // This now correctly writes to the default ('telegram') database
+            
             DB::table('telegram_verification_tokens')->updateOrInsert(
                 ['user_id' => $user->id],
                 [
@@ -96,8 +95,6 @@ class ProfileController extends Controller
             'token' => 'required|string',
             'chat_id' => 'required|integer',
         ]);
-
-        // This now correctly queries the default ('telegram') database
         $tokenRecord = DB::table('telegram_verification_tokens')
             ->where('token', $validated['token'])
             ->where('expires_at', '>', Carbon::now())
@@ -112,8 +109,6 @@ class ProfileController extends Controller
             $user->telegram_chat_id = $validated['chat_id'];
             $user->save();
         }
-
-        // This now correctly deletes from the default ('telegram') database
         DB::table('telegram_verification_tokens')->where('id', $tokenRecord->id)->delete();
 
         return response()->json(['success' => true, 'message' => 'Account connected successfully!']);

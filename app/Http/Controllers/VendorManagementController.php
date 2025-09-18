@@ -13,7 +13,7 @@ class VendorManagementController extends Controller
      */
     public function index()
     {
-        Gate::authorize('manage-users'); // Protect the page
+        Gate::authorize('manage-users'); 
 
         $vendors = DB::connection('mysql_application')
             ->table('vendors')
