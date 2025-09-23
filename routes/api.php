@@ -10,6 +10,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\LogisticsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\OcrSearchController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\PurchaseReportController;
 
 /*
@@ -46,6 +48,12 @@ Route::post('/import-purchases', [DataController::class, 'importPurchasesApi']);
 // --- Action Routes (POST requests that change data) ---
 Route::post('/requests/{purchaseRequest}/status', [PurchaseRequestController::class, 'updateStatusApi']);
 Route::post('/telegram-connect/verify', [ProfileController::class, 'verifyTelegramConnectionApi']);
+
+Route::get('/ocr/search', [OcrSearchController::class, 'searchDocumentsApi']);
+Route::post('/verifications/{verificationRequest}/status', [VerificationController::class, 'updateStatusApi']);
+
+
+Route::post('/verifications/{verificationRequest}/status', [VerificationController::class, 'updateStatusApi']);
 
 //==========================================================================
 // WEB APP-FACING ROUTES HAVE BEEN MOVED TO web.php

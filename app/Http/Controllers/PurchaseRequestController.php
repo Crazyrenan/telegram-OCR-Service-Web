@@ -6,11 +6,14 @@ use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use App\Traits\NotifiesViaTelegram;
 
 class PurchaseRequestController extends Controller
 {
+    use NotifiesViaTelegram; // Use the Trait for notifications
+
     /**
      * Display a listing of the user's purchase requests.
      */
@@ -52,6 +55,43 @@ class PurchaseRequestController extends Controller
     }
 
     /**
+     * Show the form for editing an existing purchase request.
+     */
+    public function edit(PurchaseRequest $purchaseRequest)
+    {
+        if (Auth::user()->id !== $purchaseRequest->user_id) {
+            abort(403);
+        }
+        if ($purchaseRequest->status !== 'pending') {
+            return redirect()->route('requests.index')->with('error', 'This request can no longer be edited.');
+        }
+        return view('requests.edit', ['request' => $purchaseRequest]);
+    }
+
+    /**
+     * Update the specified purchase request in storage.
+     */
+    public function update(Request $request, PurchaseRequest $purchaseRequest)
+    {
+        if (Auth::user()->id !== $purchaseRequest->user_id) {
+            abort(403);
+        }
+        if ($purchaseRequest->status !== 'pending') {
+            return redirect()->route('requests.index')->with('error', 'This request can no longer be edited as it has been processed.');
+        }
+
+        $validated = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'reason' => 'required|string',
+        ]);
+
+        $purchaseRequest->update($validated);
+
+        return redirect()->route('requests.index')->with('success', 'Purchase request updated successfully!');
+    }
+
+    /**
      * API endpoint for the bot to update the status of a request.
      */
     public function updateStatusApi(Request $request, PurchaseRequest $purchaseRequest)
@@ -62,6 +102,8 @@ class PurchaseRequestController extends Controller
 
         $purchaseRequest->status = $validated['status'];
         $purchaseRequest->save();
+
+        // After updating, send a notification back to the original user.
         $this->notifyUserOfStatusUpdate($purchaseRequest);
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
@@ -79,42 +121,16 @@ class PurchaseRequestController extends Controller
         return back()->with('error', 'This request is no longer pending and cannot be re-sent.');
     }
 
-
-    private function notifyManagerViaBot(PurchaseRequest $purchaseRequest)
-    {
-        $manager = User::where('role', 'manager')->first();
-        if (!$manager || !$manager->telegram_chat_id) {
-            Log::error('Manager with role "manager" not found or has not connected their Telegram account.');
-            return;
-        }
-
-        try {
-            $flaskUrl = 'http://127.0.0.1:5001/send-approval-request';
-            
-            Http::post($flaskUrl, [
-                'manager_chat_id' => $manager->telegram_chat_id,
-                'request_id' => $purchaseRequest->id,
-                'user_name' => Auth::user()->name, 
-                'item_name' => $purchaseRequest->item_name,
-                'amount' => $purchaseRequest->amount,
-                'reason' => $purchaseRequest->reason,
-            ]);
-
-            Log::info('Successfully sent approval request to Flask service.');
-        } catch (\Exception $e) {
-            Log::error('Failed to send approval request to Flask service: ' . $e->getMessage());
-        }
-    }
-
     /**
      * Notifies the original user about the status update of their request.
      */
     private function notifyUserOfStatusUpdate(PurchaseRequest $purchaseRequest)
     {
-        $user = $purchaseRequest->user; // Get the user who made the request
+        // Manually find the user from the default ('telegram') database
+        $user = User::find($purchaseRequest->user_id);
 
         if (!$user || !$user->telegram_chat_id) {
-            Log::info("User {$user->id} has no Telegram chat ID, skipping notification.");
+            Log::info("User with ID {$purchaseRequest->user_id} has no Telegram chat ID, skipping notification.");
             return;
         }
 
@@ -125,6 +141,7 @@ class PurchaseRequestController extends Controller
                 'user_chat_id' => $user->telegram_chat_id,
                 'item_name' => $purchaseRequest->item_name,
                 'status' => $purchaseRequest->status,
+                'type' => 'purchase' // Differentiate the notification type
             ]);
 
             Log::info("Successfully sent status update notification to user {$user->id}.");

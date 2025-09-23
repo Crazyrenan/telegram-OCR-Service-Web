@@ -9,7 +9,6 @@ return [
 
     'connections' => [
 
-        // This is your EXISTING default connection for the 'telegram' database
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -29,8 +28,6 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-
-        // THIS IS YOUR NEW CONNECTION for the 'application' database
         'mysql_application' => [
             'driver' => 'mysql',
             'host' => env('DB_APPLICATION_HOST', '127.0.0.1'),
@@ -49,6 +46,20 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+
+          'mysql_ocr' => [
+                'driver' => 'mysql',
+                'host' => env('DB_OCR_HOST', '127.0.0.1'),
+                'port' => env('DB_OCR_PORT', '3306'),
+                'database' => env('DB_OCR_DATABASE', 'ocr_rnd'),
+                'username' => env('DB_OCR_USERNAME', 'root'),
+                'password' => env('DB_OCR_PASSWORD', ''),
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => true,
+                'engine' => null,
+            ],
 
         // ... other connections like sqlite, pgsql, etc. ...
     ],
