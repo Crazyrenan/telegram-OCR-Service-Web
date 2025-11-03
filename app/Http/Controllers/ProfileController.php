@@ -8,33 +8,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
+    /**
+     * Display the user's profile form.
+     */
     public function edit(Request $request): View
     {
-        $currentUser = $request->user();
-        $now = Carbon::now();
-
-        // This now correctly queries the default ('telegram') database
-        $token = DB::table('telegram_verification_tokens')
-            ->where('user_id', $currentUser->id)
-            ->where('expires_at', '>', $now)
-            ->first();
-        
-        Log::info($token ? 'SUCCESS: A valid token was found.' : 'FAILURE: No valid token was found.');
-
         return view('profile.edit', [
-            'user' => $currentUser,
-            'telegramToken' => $token,
+            'user' => $request->user(),
         ]);
     }
 
+    /**
+     * Update the user's profile information.
+     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
@@ -45,6 +37,9 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
     
+    /**
+     * Delete the user's account.
+     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -58,60 +53,68 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function startTelegramConnection(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-        if (!$user) {
-            return back()->with('error', 'Your session may have expired. Please try again.');
-        }
-
-        try {
-            $token = Str::random(16);
-            $now = Carbon::now();
-            
-            DB::table('telegram_verification_tokens')->updateOrInsert(
-                ['user_id' => $user->id],
-                [
-                    'token' => $token,
-                    'expires_at' => $now->copy()->addMinutes(10),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]
-            );
-            
-            Log::info('SUCCESS: Generated a new Telegram token for user: ' . $user->id);
-
-        } catch (\Exception $e) {
-            Log::error('DATABASE ERROR while generating token: ' . $e->getMessage());
-            return back()->with('error', 'Could not generate a connection token due to a database error.');
-        }
-
-        return Redirect::route('profile.edit');
-    }
-
-    public function verifyTelegramConnectionApi(Request $request)
+    /**
+     * API endpoint for the bot to connect a user via email.
+     */
+    public function registerTelegramUserApi(Request $request)
     {
         $validated = $request->validate([
-            'token' => 'required|string',
-            'chat_id' => 'required|integer',
+            'email' => 'required|email',
+            'chat_id' => 'required|string', // chat_id can be a string
         ]);
-        $tokenRecord = DB::table('telegram_verification_tokens')
-            ->where('token', $validated['token'])
-            ->where('expires_at', '>', Carbon::now())
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'No user account was found with that email address.'], 404);
+        }
+
+        // Check if this chat ID is already connected to any user
+        $existingConnection = DB::table('telegram_connections')
+            ->where('chat_id', $validated['chat_id'])
             ->first();
 
-        if (!$tokenRecord) {
-            return response()->json(['success' => false, 'message' => 'Token is invalid or has expired.'], 404);
+        if ($existingConnection) {
+            return response()->json(['success' => false, 'message' => 'This Telegram account is already connected to a user.'], 400);
         }
 
-        $user = User::find($tokenRecord->user_id);
-        if ($user) {
-            $user->telegram_chat_id = $validated['chat_id'];
-            $user->save();
-        }
-        DB::table('telegram_verification_tokens')->where('id', $tokenRecord->id)->delete();
+        // Create the new connection
+        DB::table('telegram_connections')->insert([
+            'user_id' => $user->id,
+            'chat_id' => $validated['chat_id'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Account connected successfully!']);
+    }
+
+    /**
+     * API endpoint for the bot to check a user's permissions.
+     * This now checks the new pivot table.
+     */
+    public function checkTelegramUserApi(Request $request)
+    {
+        $chatId = $request->input('chat_id');
+        
+        // Find the connection in the new table
+        $connection = DB::table('telegram_connections')->where('chat_id', $chatId)->first();
+
+        if (!$connection) {
+            return response()->json(['status' => 'unauthorized'], 401);
+        }
+
+        // Find the associated user and return their role
+        $user = User::find($connection->user_id);
+
+        if (!$user) {
+            return response()->json(['status' => 'unauthorized', 'message' => 'User not found.'], 401);
+        }
+
+        return response()->json([
+            'status' => 'authorized',
+            'role' => $user->role,
+        ]);
     }
 }
 

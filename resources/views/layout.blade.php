@@ -20,7 +20,7 @@
 </head>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
-    <div x-data="{ open: false, profileOpen: false, requestsOpen: false }" class="min-h-screen">
+    <div x-data="{ open: false, profileOpen: false, requestsOpen: false, adminOpen: false }" class="min-h-screen">
         <!-- Navigation Bar -->
         <nav class="bg-white shadow-md">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,17 +31,18 @@
                             <svg class="h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                             </svg>
-                            <span class="font-bold text-xl text-gray-800">TelePortal</span>
+                            <span class="font-bold text-xl text-gray-800">AppPortal</span>
                         </a>
                     </div>
 
-
+                    <!-- Main Nav Links (Desktop) -->
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-4">
                             <a href="/" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Home</a>
                             @auth
                                 <a href="{{ route('dashboard') }}" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
                                 
+                                <!-- Requests Dropdown -->
                                 <div class="relative" @click.away="requestsOpen = false">
                                     <button @click="requestsOpen = !requestsOpen" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                                         <span>Requests</span>
@@ -56,9 +57,22 @@
                                 </div>
                                 <a href="{{ route('search.form') }}" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Search Documents</a>
                                 
+                                <!-- NEW: Admin Dropdown (Manager-Only) -->
                                 @can('manage-users')
-                                    <a href="{{ route('users.manage.index') }}" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">User Management</a>
-                                    <a href="{{ route('verifications.manage.index') }}" class="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Manage Verifications</a>
+                                    <div class="relative" @click.away="adminOpen = false">
+                                        <button @click="adminOpen = !adminOpen" class="text-gray-600 bg-red-100 text-red-700 font-bold px-3 py-2 rounded-md text-sm flex items-center">
+                                            <span>Admin</span>
+                                            <svg class="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                        <div x-show="adminOpen" x-transition class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                            <div class="py-1" role="menu" aria-orientation="vertical">
+                                                <a href="{{ route('users.manage.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage User Roles</a>
+                                                <a href="{{ route('users.telegram.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Bot Users</a>
+                                                <a href="{{ route('verifications.manage.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Verifications</a>
+                                                <a href="{{ route('reports.purchases.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Purchase Report</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endcan
                             @endauth
                         </div>

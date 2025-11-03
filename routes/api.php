@@ -46,8 +46,8 @@ Route::get('/export-purchases', [DataController::class, 'exportPurchasesApi']);
 Route::post('/import-purchases', [DataController::class, 'importPurchasesApi']);
 
 // --- Action Routes (POST requests that change data) ---
-Route::post('/requests/{purchaseRequest}/status', [PurchaseRequestController::class, 'updateStatusApi']);
-Route::post('/telegram-connect/verify', [ProfileController::class, 'verifyTelegramConnectionApi']);
+Route::post('/telegram-register', [ProfileController::class, 'registerTelegramUserApi']);
+Route::post('/telegram-check-user', [ProfileController::class, 'checkTelegramUserApi']);
 
 Route::get('/ocr/search', [OcrSearchController::class, 'searchDocumentsApi']);
 Route::post('/verifications/{verificationRequest}/status', [VerificationController::class, 'updateStatusApi']);

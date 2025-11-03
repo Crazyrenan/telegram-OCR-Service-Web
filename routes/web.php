@@ -60,8 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ocr/search/results', [OcrController::class, 'handleSearch'])->name('search.results');
     Route::get('/ocr/documents/{id}', [OcrController::class, 'showDocumentViewer'])->name('document.viewer');
     Route::get('/ocr/images/{id}', [OcrController::class, 'showImageViewer'])->name('image.viewer');
-    Route::get('/manage/verifications', [VerificationManagementController::class, 'index'])->name('verifications.manage.index');
-    Route::post('/manage/verifications/{verificationRequest}/resend', [VerificationManagementController::class, 'resendNotification'])->name('verifications.manage.resend');
+
 
 
     // --- Manager-Only Routes (Nested for extra security) ---
@@ -69,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
         // User Role Management
         Route::get('/manage/users', [UserManagementController::class, 'index'])->name('users.manage.index');
         Route::post('/manage/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.manage.updateRole');
+        Route::get('/manage/telegram-users', [UserManagementController::class, 'listTelegramUsers'])->name('users.telegram.index');
+        Route::delete('/manage/telegram-users/{id}', [UserManagementController::class, 'removeTelegramUser'])->name('users.telegram.remove');
         
         // Vendor Management
         Route::get('/manage/vendors', [VendorManagementController::class, 'index'])->name('vendors.manage.index');
@@ -81,6 +82,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reports/purchases', [PurchaseReportController::class, 'index'])->name('reports.purchases.index');
         Route::get('/reports/purchases/export', [PurchaseReportController::class, 'export'])->name('reports.purchases.export');
         Route::get('/web-api/reports/purchases', [PurchaseReportController::class, 'fetchData'])->name('reports.purchases.data');
+
+        Route::get('/manage/verifications', [VerificationManagementController::class, 'index'])->name('verifications.manage.index');
+        Route::post('/manage/verifications/{verificationRequest}/resend', [VerificationManagementController::class, 'resendNotification'])->name('verifications.manage.resend');
     });
 
 });
