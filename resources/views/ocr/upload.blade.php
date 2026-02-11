@@ -1,39 +1,67 @@
-@extends('layout')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Upload Dokumen') }}
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-    <div class="text-center">
-        <h1 class="text-2xl font-bold text-gray-800">Process New Invoice</h1>
-        <p class="text-gray-600 mt-2">Upload an invoice (JPEG, PNG, or PDF). The system will use OCR to read the contents and for approval.</p>
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100">
+                <div class="p-8 text-gray-900">
+                    
+                    {{-- Header Section yang Ramah --}}
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800">Scan Dokumen Anda</h3>
+                        <p class="text-gray-500 mt-2">Kami akan mengekstrak teks dari gambar secara otomatis.</p>
+                    </div>
+
+                    <form action="{{ route('ocr.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        @csrf
+                        
+                        {{-- Drag & Drop Area --}}
+                        <div class="flex items-center justify-center w-full">
+                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-indigo-300 border-dashed rounded-xl cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition duration-300 ease-in-out group">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    {{-- Icon Upload (Heroicons) --}}
+                                    <svg class="w-12 h-12 mb-4 text-indigo-500 group-hover:scale-110 transition-transform" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-600"><span class="font-bold text-indigo-600">Klik untuk upload</span> atau seret file ke sini</p>
+                                    <p class="text-xs text-gray-400">PNG, JPG or JPEG (MAX. 2MB)</p>
+                                </div>
+                                <input id="dropzone-file" name="image" type="file" class="hidden" onchange="previewImage(event)" />
+                            </label>
+                        </div>
+
+                        {{-- Image Preview Container (Hidden by default) --}}
+                        <div id="preview-container" class="hidden mt-4 text-center">
+                            <p class="text-sm text-gray-500 mb-2">Preview:</p>
+                            <img id="preview-img" class="max-h-64 mx-auto rounded-lg shadow-md" src="#" alt="Image preview" />
+                        </div>
+
+                        <div class="flex justify-end">
+                            <x-primary-button class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all">
+                                {{ __('Proses OCR Sekarang') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative my-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
-    @endif
-
-    <form action="{{ route('ocr.process.request') }}" method="POST" enctype="multipart/form-data" class="mt-8">
-        @csrf
-        <div>
-            <label for="invoice_file" class="block text-sm font-medium text-gray-700 mb-2">Invoice File</label>
-            <input type="file" name="invoice_file" id="invoice_file" class="mt-1 block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100" required>
-        </div>
-        <div class="mt-6">
-            <button type="submit" class="w-full btn-primary py-3">Upload and Process Invoice</button>
-        </div>
-    </form>
-</div>
-@endsection
-
+    {{-- Script Sederhana untuk Preview --}}
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('preview-img');
+                const container = document.getElementById('preview-container');
+                output.src = reader.result;
+                container.classList.remove('hidden');
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</x-app-layout>

@@ -11,22 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ocr_documents', function (Blueprint $table) {
+        // PENTING: Menggunakan connection('mysql_ocr') agar masuk ke database ocr_rnd
+        Schema::connection('mysql_ocr')->create('ocr_documents', function (Blueprint $table) {
             $table->id();
             $table->string('original_filename');
-            $table->string('stored_path'); // To store the file path
+            $table->string('stored_path');
             $table->longText('extracted_text');
-            $table->json('word_data')->nullable(); 
-            $table->string('thumbnail_path')->nullable(); 
+            $table->json('word_data')->nullable();
+            $table->string('thumbnail_path')->nullable();
             $table->timestamps();
         });
-}
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('ocr_documents');
+        Schema::connection('mysql_ocr')->dropIfExists('ocr_documents');
     }
 };
