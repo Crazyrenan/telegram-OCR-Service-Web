@@ -7,30 +7,39 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
+    <body class="font-sans antialiased bg-gray-50 text-gray-900" x-data="{ sidebarOpen: false }">
+        
+        <div class="flex h-screen overflow-hidden">
+            @include('layouts.sidebar')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-20 bg-black/50 md:hidden" style="display: none;"></div>
+
+            <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+                
+                <header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 py-4 md:hidden">
+                    <div class="flex items-center gap-3">
+                        <button @click="sidebarOpen = true" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <span class="font-bold text-gray-800">OCR Service</span>
                     </div>
                 </header>
-            @endisset
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                    @if (session('status'))
+                        <div class="mb-6 p-4 rounded-xl bg-accent-500/10 border border-accent-500/20 text-accent-600 font-medium">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
     </body>
 </html>
