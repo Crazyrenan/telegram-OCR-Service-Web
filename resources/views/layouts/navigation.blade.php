@@ -10,12 +10,9 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    {{-- Ubah text-gray-500 menjadi text-gray-300 untuk navbar gelap --}}
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-gray-300 hover:text-white hover:border-gray-300 focus:text-white">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    
-                    {{-- Tambahkan link lain dengan style yang sama --}}
                 </div>
             </div>
 
