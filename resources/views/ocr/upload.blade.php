@@ -16,7 +16,7 @@
                         <p class="text-gray-500 mt-2">Kami akan mengekstrak teks dari gambar secara otomatis.</p>
                     </div>
 
-                    <form action="{{ route('ocr.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="{{ route('ocr.process.request') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         
                         {{-- Drag & Drop Area --}}

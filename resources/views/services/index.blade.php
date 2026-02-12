@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('layouts.app')
 
 @section('content')
 <div class="p-6 bg-white rounded-lg shadow-md max-w-3xl mx-auto" x-data="{ service: 'none' }">

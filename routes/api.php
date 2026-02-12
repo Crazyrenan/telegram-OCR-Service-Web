@@ -49,13 +49,10 @@ Route::post('/import-purchases', [DataController::class, 'importPurchasesApi']);
 Route::post('/telegram-register', [ProfileController::class, 'registerTelegramUserApi']);
 Route::post('/telegram-check-user', [ProfileController::class, 'checkTelegramUserApi']);
 
+// --- OCR & Verification Routes ---
 Route::get('/ocr/search', [OcrSearchController::class, 'searchDocumentsApi']);
-Route::post('/verifications/{verificationRequest}/status', [VerificationController::class, 'updateStatusApi']);
-
-
 Route::post('/verifications/{verificationRequest}/status', [VerificationController::class, 'updateStatusApi']);
 
 //==========================================================================
 // WEB APP-FACING ROUTES HAVE BEEN MOVED TO web.php
 //==========================================================================
-
