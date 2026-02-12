@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('layouts.app')
 
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-[calc(100vh-150px)]">
